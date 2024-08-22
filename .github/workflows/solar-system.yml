@@ -43,7 +43,6 @@ jobs:
           with:
             name: Mocha-Test-Result
             path: test-results.xml
-  
     code-coverage:
       name: Code Coverage
       runs-on: ubuntu-latest
@@ -69,4 +68,22 @@ jobs:
             name: Code-Coverage-Result
             path: coverage
             retention-days: 5
-    
+        
+    docker: 
+      name: docker
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Login to GitHub Container Registry
+          run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u lmfortunato --password-stdin
+
+        - name: Push Docker Image
+          id: docker
+          uses: docker/build-push-action@v4
+          with:
+              context: .
+              push: true
+              tags: ghcr.io/lmfortunato/solar-system:${{ github.sha }}
+
